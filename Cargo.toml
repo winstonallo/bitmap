@@ -5,6 +5,10 @@ members = ["macros"]
 name = "bitmap"
 version = "0.1.0"
 edition = "2024"
+test = true
 
 [dependencies]
 macros = { path = "./macros" }
+
+[dev-dependencies]
+trybuild = "1.0.111"

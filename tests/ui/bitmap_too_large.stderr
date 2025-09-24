@@ -1,0 +1,5 @@
+error: Too many fields: max supported size is 64 bits
+ --> tests/ui/bitmap_too_large.rs:5:16
+  |
+5 |         struct Bits {
+  |                ^^^^

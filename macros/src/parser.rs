@@ -5,11 +5,9 @@ use syn::{
     parse::{Parse, ParseStream},
 };
 
-const BITMAP_TYPES: [&'static str; 7] = ["u1", "u2", "u3", "u4", "u5", "u6", "u7"];
-
 pub struct BitmapInput {
     pub name: Ident,
-    pub fields: Vec<Ident>,
+    pub fields: Vec<FieldDef>,
 }
 
 impl Parse for BitmapInput {
@@ -19,13 +17,14 @@ impl Parse for BitmapInput {
         let content;
         braced!(content in input);
         let punctuation: Punctuated<FieldDef, Token![,]> = content.parse_terminated(FieldDef::parse, Token![,])?;
-        let fields = punctuation.into_iter().map(|f| f.name).collect();
+        let fields = punctuation.into_iter().collect();
         Ok(BitmapInput { name, fields })
     }
 }
 
-struct FieldDef {
-    name: Ident,
+pub struct FieldDef {
+    pub name: Ident,
+    pub size: u8,
 }
 
 impl Parse for FieldDef {
@@ -34,10 +33,17 @@ impl Parse for FieldDef {
         let _: Token![:] = input.parse()?;
         let ty: Ident = input.parse()?;
 
-        if !BITMAP_TYPES.contains(&ty.to_string().as_str()) {
-            return Err(syn::Error::new_spanned(ty, "Expected one of u1, u2, u3, u4, u5, u6, and u7"));
-        }
+        let size = match ty.to_string().as_str() {
+            "u1" => 1,
+            "u2" => 2,
+            "u3" => 3,
+            "u4" => 4,
+            "u5" => 5,
+            "u6" => 6,
+            "u7" => 7,
+            _ => return Err(syn::Error::new_spanned(ty, "Expected one of u1, u2, u3, u4, u5, u6, and u7")),
+        };
 
-        Ok(FieldDef { name })
+        Ok(FieldDef { name, size })
     }
 }

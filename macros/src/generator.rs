@@ -6,13 +6,13 @@ use crate::parser::BitmapInput;
 pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
     let name = &input.name;
     let fields = &input.fields;
-    let num_fields = fields.len();
+    let size = input.fields.iter().map(|f| f.size).sum();
 
-    if num_fields > 64 {
-        return Err(syn::Error::new_spanned(name, "Too many fields: max supported is 64"));
+    if size > 64 {
+        return Err(syn::Error::new_spanned(name, "Too many fields: max supported size is 64 bits"));
     }
 
-    let storage_ty = match num_fields {
+    let storage_ty = match size {
         0..=8 => quote! { u8 },
         9..=16 => quote! { u16 },
         17..=32 => quote! { u32 },
@@ -20,21 +20,29 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         _ => unreachable!(),
     };
 
-    let accessors = fields.iter().enumerate().map(|(i, ident)| {
-        let index = i as u64;
-        let setter_name = Ident::new(&format!("set_{ident}"), ident.span());
-
+    let mut bit_index = 0;
+    let accessors = fields.iter().map(|ident| {
+        let index: u8 = bit_index;
+        bit_index += ident.size;
+        let setter_name = Ident::new(&format!("set_{}", ident.name), ident.name.span());
+        let name = ident.name.to_owned();
+        let mask = match ident.size {
+            1 => quote! { 0b1 as #storage_ty },
+            2 => quote! { 0b11 as #storage_ty },
+            3 => quote! { 0b111 as #storage_ty },
+            4 => quote! { 0b1111 as #storage_ty },
+            5 => quote! { 0b11111 as #storage_ty },
+            6 => quote! { 0b111111 as #storage_ty },
+            7 => quote! { 0b1111111 as #storage_ty },
+            _ => unreachable!(),
+        };
         quote! {
-            pub fn #ident(&self) -> u8 {
-                (self.0 >> #index) & 1
+            pub fn #name(&self) -> #storage_ty {
+                (self.0 >> #index) & #mask
             }
 
-            pub fn #setter_name(&mut self, val: bool) {
-                if val {
-                     self.0 |= 1 << #index;
-                 } else {
-                     self.0 &= !(1 << #index);
-                 }
+            pub fn #setter_name(&mut self, val: u8) {
+                self.0 = ((self.0 & !((#mask) << #index)) | (((val as #storage_ty) & #mask) << #index));
             }
         }
     });

@@ -1,0 +1,21 @@
+name: unit tests
+on:
+    push:
+        branches: ["*"]
+        paths:
+            - src/**
+            - tests/**
+            - Cargo.toml
+            - Cargo.lock
+            - .github/workflows/unit-tests.yml
+jobs:
+    run-cargo-test:
+        runs-on: ubuntu-latest
+        container: ghcr.io/winstonallo/kernel-test-runner
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Run tests
+              run: cargo test --lib

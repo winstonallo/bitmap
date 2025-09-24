@@ -1,0 +1,21 @@
+name: clippy
+on:
+    push:
+        branches: ["*"]
+        paths:
+            - src/**
+            - tests/**
+            - Cargo.toml
+            - Cargo.lock
+            - .github/workflows/clippy.yml
+jobs:
+    run-clippy:
+        runs-on: ubuntu-latest
+        container: ghcr.io/winstonallo/kernel-test-runner
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Run clippy
+              run: cargo clippy -- -D warnings

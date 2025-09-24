@@ -3,6 +3,7 @@ on:
     push:
         branches: ["*"]
         paths:
+            - macros/**
             - src/**
             - tests/**
             - Cargo.toml
@@ -18,4 +19,4 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Run tests
-              run: cargo test --lib
+              run: cargo test

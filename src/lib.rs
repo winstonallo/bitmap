@@ -1,4 +1,4 @@
-use r#macro::bitmap;
+use macros::bitmap;
 
 #[test]
 fn it_works() {

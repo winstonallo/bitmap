@@ -26,16 +26,8 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         bit_index += ident.size;
         let setter_name = Ident::new(&format!("set_{}", ident.name), ident.name.span());
         let name = ident.name.to_owned();
-        let mask = match ident.size {
-            1 => quote! { 0b1 as #storage_ty },
-            2 => quote! { 0b11 as #storage_ty },
-            3 => quote! { 0b111 as #storage_ty },
-            4 => quote! { 0b1111 as #storage_ty },
-            5 => quote! { 0b11111 as #storage_ty },
-            6 => quote! { 0b111111 as #storage_ty },
-            7 => quote! { 0b1111111 as #storage_ty },
-            _ => unreachable!(),
-        };
+        let size = ident.size;
+        let mask = quote! { ((0b1 << #size) - 1) as #storage_ty };
         quote! {
             pub fn #name(&self) -> #storage_ty {
                 (self.0 >> #index) & #mask

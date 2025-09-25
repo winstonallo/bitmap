@@ -9,3 +9,9 @@ fn invalid_type() {
     let t = trybuild::TestCases::new();
     t.compile_fail("tests/ui/invalid_type.rs");
 }
+
+#[test]
+fn invalid_type_zero() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/ui/invalid_type_zero.rs");
+}

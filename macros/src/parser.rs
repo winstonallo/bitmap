@@ -33,16 +33,18 @@ impl Parse for FieldDef {
         let _: Token![:] = input.parse()?;
         let ty: Ident = input.parse()?;
 
-        let size = match ty.to_string().as_str() {
-            "u1" => 1,
-            "u2" => 2,
-            "u3" => 3,
-            "u4" => 4,
-            "u5" => 5,
-            "u6" => 6,
-            "u7" => 7,
-            _ => return Err(syn::Error::new_spanned(ty, "Expected one of u1, u2, u3, u4, u5, u6, and u7")),
+        let ty_str = ty.to_string();
+        let ty_str = ty_str.as_str();
+        if !ty_str.starts_with("u") {
+            return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty_str}, expected u{{1..128}}")));
+        }
+        let size = *match &ty_str[1..].parse::<u8>() {
+            Ok(val) => val,
+            Err(e) => return Err(syn::Error::new_spanned(ty, format!("Could not parse type size: {e}"))),
         };
+        if size == 0 || size > 128 {
+            return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty_str}, expected u{{1..128}}")));
+        }
 
         Ok(FieldDef { name, size })
     }

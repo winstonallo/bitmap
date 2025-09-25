@@ -1,5 +1,5 @@
-error: Expected one of u1, u2, u3, u4, u5, u6, and u7
+error: Invalid size for u129, expected u{1..128}
  --> tests/ui/invalid_type.rs:6:21
   |
-6 |             field0: u8,
-  |                     ^^
+6 |             field0: u129,
+  |                     ^^^^

@@ -8,11 +8,11 @@
 //! use macros::bitmap;
 //!
 //! bitmap!(
-//! 	struct Player {
-//!			imposter: u1,
-//! 		finished_tasks: u3,
-//! 		kills: u3,
-//!		}
+//!     struct Player {
+//!         imposter: u1,
+//!         finished_tasks: u3,
+//!         kills: u3,
+//!     }
 //! );
 //!
 //! let mut player = Player(0);

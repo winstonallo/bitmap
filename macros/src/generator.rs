@@ -26,6 +26,7 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
     let name = &input.name;
     let fields = &input.fields;
     let size: usize = input.fields.iter().map(|f| f.size as usize).sum();
+    let _packed_layout = get_packed_layout(size);
 
     if size > 128 {
         return Err(syn::Error::new_spanned(name, "Too many fields: max supported size is 64 bits"));

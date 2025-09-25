@@ -2,16 +2,12 @@
 
 Procedural macro for defining bitmap structs packed as tightly as possible.  
 
----
-
 ## Features
 
 - Define fields with `u1` to `u7` widths
 - Up to 64 bits total per struct
 - Auto-generates getters and setters
 - Single `u64` backing storage
-
----
 
 ## Example
 

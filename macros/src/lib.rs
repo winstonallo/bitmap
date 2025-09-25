@@ -23,7 +23,7 @@ mod parser;
 ///
 /// ### Example
 /// ```
-/// # use macros::bitmap;
+/// use macros::bitmap;
 ///
 /// bitmap!(
 ///     struct Player {

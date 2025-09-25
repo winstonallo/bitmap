@@ -3,7 +3,8 @@ on:
     push:
         branches: ["*"]
         paths:
-            - macros/**
+            - macros/src/**
+            - macros/tests/**
             - src/**
             - tests/**
             - Cargo.toml

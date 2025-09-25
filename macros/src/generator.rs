@@ -3,10 +3,24 @@ use quote::quote;
 
 use crate::parser::BitmapInput;
 
+fn get_packed_layout(size: usize) -> Vec<u8> {
+    let mut running_size = size;
+    let mut sizes = Vec::<u8>::new();
+    let usizes = &[128, 64, 32, 16, 8];
+
+    for usz in usizes {
+        while running_size >= *usz as usize {
+            sizes.push(*usz);
+            running_size -= *usz as usize;
+        }
+    }
+    sizes
+}
+
 pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
     let name = &input.name;
     let fields = &input.fields;
-    let size = input.fields.iter().map(|f| f.size).sum();
+    let size: usize = input.fields.iter().map(|f| f.size as usize).sum();
 
     if size > 128 {
         return Err(syn::Error::new_spanned(name, "Too many fields: max supported size is 64 bits"));

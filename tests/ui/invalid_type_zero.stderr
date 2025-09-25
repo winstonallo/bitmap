@@ -1,0 +1,5 @@
+error: Invalid size for u0, expected u{1..128}
+ --> tests/ui/invalid_type_zero.rs:6:21
+  |
+6 |             field0: u0,
+  |                     ^^

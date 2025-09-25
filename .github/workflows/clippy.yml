@@ -1,13 +1,16 @@
 name: clippy
 on:
-    push:
+    push: &trigger_config
         branches: ["*"]
         paths:
+            - macros/**
             - src/**
             - tests/**
             - Cargo.toml
             - Cargo.lock
             - .github/workflows/clippy.yml
+    pull_request:
+        <<: *trigger_config
 jobs:
     run-clippy:
         runs-on: ubuntu-latest

@@ -1,15 +1,16 @@
 name: unit tests
 on:
-    push:
+    push: &trigger_config
         branches: ["*"]
         paths:
-            - macros/src/**
-            - macros/tests/**
+            - macros/**
             - src/**
             - tests/**
             - Cargo.toml
             - Cargo.lock
             - .github/workflows/tests.yml
+    pull_request:
+        <<: *trigger_config
 jobs:
     run-cargo-test:
         runs-on: ubuntu-latest

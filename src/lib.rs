@@ -66,8 +66,8 @@ fn sixty_four_bits() {
         }
     );
     let mut bits = Bits(0xFF00FF00FF00FF00);
-    bits.set_j(0b0000000);
-    assert_eq!(bits.0, 0x0100FF00FF00FF00);
+    bits.set_j(0b0000000).set_i(0b1111111).set_a(0b1);
+    assert_eq!(bits.0, 0x01FCFF00FF00FF01);
 }
 
 macro_rules! test_width {

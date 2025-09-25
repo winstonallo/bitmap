@@ -33,8 +33,9 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
                 (self.0 >> #index) & #mask
             }
 
-            pub fn #setter_name(&mut self, val: u8) {
+            pub fn #setter_name(&mut self, val: u8) -> &mut Self {
                 self.0 = ((self.0 & !((#mask) << #index)) | (((val as #storage_ty) & #mask) << #index));
+                self
             }
         }
     });

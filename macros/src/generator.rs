@@ -5,17 +5,17 @@ use crate::parser::BitmapInput;
 
 fn get_packed_layout(size: usize) -> Vec<u8> {
     let usizes = [128, 64, 32, 16, 8];
-    let mut running_size = size;
+    let mut remainder = size;
     let mut sizes = Vec::<u8>::new();
 
     for &usz in &usizes {
-        while running_size >= usz as usize {
+        while remainder >= usz as usize {
             sizes.push(usz);
-            running_size -= usz as usize;
+            remainder -= usz as usize;
         }
     }
 
-    if running_size > 0 {
+    if remainder > 0 {
         sizes.push(8);
     }
 

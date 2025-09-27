@@ -22,27 +22,32 @@ fn get_packed_layout(size: usize) -> Vec<u8> {
     sizes
 }
 
-pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
-    let name = &input.name;
-    let fields = &input.fields;
-    let size: usize = input.fields.iter().map(|f| f.size as usize).sum();
-    let _packed_layout = get_packed_layout(size);
-
-    if size > 128 {
-        return Err(syn::Error::new_spanned(name, "Too many fields: max supported size is 64 bits"));
-    }
-
-    let storage_ty = match size {
+fn get_storage_ty(size: u8) -> TokenStream2 {
+    match size {
         0..=8 => quote! { u8 },
         9..=16 => quote! { u16 },
         17..=32 => quote! { u32 },
         33..=64 => quote! { u64 },
         65..=128 => quote! { u128 },
         _ => unreachable!(),
-    };
+    }
+}
+
+pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
+    let name = &input.name;
+    let fields = &input.fields;
+    let size: usize = input.fields.iter().map(|f| f.size as usize).sum();
+    let _packed_layout = get_packed_layout(size);
+
+    let storage_ty = get_storage_ty(size as u8);
 
     let mut bit_index = 0;
+    let mut storage_index = 0;
+    let mut current_storage_ty_index = 0;
     let accessors = fields.iter().map(|ident| {
+        if ident.size + current_storage_ty_index >= _packed_layout[storage_index] {
+            // handle field spanning multiple storage units
+        }
         let index: u8 = bit_index;
         bit_index += ident.size;
         let setter_name = Ident::new(&format!("set_{}", ident.name), ident.name.span());

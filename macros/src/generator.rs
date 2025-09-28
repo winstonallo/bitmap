@@ -54,11 +54,13 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         let size = ident.size;
         let mask = quote! { ((0b1 << #size) - 1) as #storage_ty };
         quote! {
-            pub fn #name(&self) -> #storage_ty {
-                (self.0 >> #index) & #mask
+            #[inline]
+            pub const fn #name(&self) -> #this_storage_ty {
+                ((self.0 >> #index) & #mask) as #this_storage_ty
             }
 
-            pub fn #setter_name(&mut self, val: u8) -> &mut Self {
+            #[inline]
+            pub fn #setter_name(&mut self, val: #this_storage_ty) -> &mut Self {
                 self.0 = ((self.0 & !((#mask) << #index)) | (((val as #storage_ty) & #mask) << #index));
                 self
             }

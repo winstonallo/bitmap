@@ -70,8 +70,8 @@ assert_eq!(*player, 0b01101011);
 For each field `name: T`, where `T` is the smallest possible integer such that
 `field_size <= integer.size`, `bitmap!` generates:
 
-- `fn name(&self) -> T` — returns the value for `name`
-- `fn set_name(&mut self, val: T)` — sets the value for `name`
+- `fn name(&self) -> T`: returns the value for `name`
+- `fn set_name(&mut self, val: T)`: sets the value for `name`
 
 ### Accessing the raw value
 

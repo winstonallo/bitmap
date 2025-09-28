@@ -54,26 +54,44 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         }
     });
 
+    let debug_fields = fields.iter().map(|ident| {
+        let field_name = &ident.name;
+        let field_name_str = field_name.to_string();
+        quote! {
+            .field(#field_name_str, &self.#field_name())
+        }
+    });
+
+    let name_str = name.to_string();
+
     Ok(quote! {
-        #[derive(Debug, Clone, Copy)]
+        #[derive(Clone, Copy)]
         #[repr(transparent)]
-         pub struct #name(#storage_ty);
+        pub struct #name(#storage_ty);
 
-         impl #name {
-             #(#accessors)*
-         }
+        impl #name {
+            #(#accessors)*
+        }
 
-         impl ::core::convert::From<#name> for #storage_ty {
-             fn from(value: #name) -> Self {
-                 value.0
-             }
-         }
+        impl ::core::convert::From<#name> for #storage_ty {
+            fn from(value: #name) -> Self {
+                value.0
+            }
+        }
 
-         impl ::core::ops::Deref for #name {
-             type Target = #storage_ty;
-             fn deref(&self) -> &Self::Target {
-                 &self.0
-             }
-         }
+        impl ::core::ops::Deref for #name {
+            type Target = #storage_ty;
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl ::core::fmt::Debug for #name {
+            fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                f.debug_struct(#name_str)
+                    #(#debug_fields)*
+                    .finish()
+            }
+        }
     })
 }

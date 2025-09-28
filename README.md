@@ -4,8 +4,7 @@
 
 This trait defines the following API:
 
-```
-
+```rust
 pub trait BitMap<T> {
     /// Gets the bit at position `index` from `&self`.
     fn get_bit(&self, index: u8) -> T;

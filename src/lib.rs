@@ -1,3 +1,5 @@
+#![no_std]
+
 pub use macros::bitmap;
 
 #[test]

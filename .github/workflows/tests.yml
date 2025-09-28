@@ -20,5 +20,8 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Run tests
+            - name: Run crate tests
               run: cargo test
+
+            - name: Run macro doc-tests
+              run: cargo test --manifest-path macros/Cargo.toml

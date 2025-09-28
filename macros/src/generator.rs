@@ -66,8 +66,9 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
             }
 
             #[inline]
-            pub fn #setter_name(&mut self, val: #this_storage_ty) -> &mut Self {
-                self.0 = ((self.0 & !((#mask) << #index)) | (((val as #storage_ty) & #mask) << #index));
+            pub fn #setter_name(&mut self, value: #this_storage_ty) -> &mut Self {
+                assert!(value <= #mask as #this_storage_ty);
+                self.0 = ((self.0 & !((#mask) << #index)) | (((value as #storage_ty) & #mask) << #index));
                 self
             }
         }

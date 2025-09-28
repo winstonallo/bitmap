@@ -1,26 +1,3 @@
-//! Generates a bitmap from the passed struct definition. The generated
-//! code includes a struct with getters and setters for each field.
-//! Supported types: `u1`, `u2`, `u3`, `u4`, `u5`, `u6`, and `u7`, maximum
-//! size: 64 bits.
-//!
-//! # Example:
-//! ```
-//! use macros::bitmap;
-//!
-//! bitmap!(
-//!     struct Player {
-//!         imposter: u1,
-//!         finished_tasks: u3,
-//!         kills: u3,
-//!     }
-//! );
-//!
-//! let mut player = Player(0);
-//! assert_eq!(std::mem::size_of::<Player>(), 1);
-//! player.set_imposter(1);
-//! player.set_finished_tasks(5);
-//! player.set_kills(3);
-//! ```
 pub use macros::bitmap;
 
 #[test]

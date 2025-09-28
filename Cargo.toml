@@ -11,3 +11,4 @@ macros = { path = "./macros" }
 
 [dev-dependencies]
 trybuild = "1.0.111"
+paste = "1.0.15"

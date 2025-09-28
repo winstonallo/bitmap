@@ -1,6 +1,9 @@
 #![no_std]
 
 pub use macros::bitmap;
+pub use traits::*;
+
+mod traits;
 
 #[test]
 fn one_bit() {

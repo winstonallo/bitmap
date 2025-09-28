@@ -1,7 +1,7 @@
 pub use macros::bitmap;
 pub use traits::*;
 
-mod traits;
+pub mod traits;
 
 #[test]
 fn one_bit() {

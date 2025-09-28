@@ -9,6 +9,59 @@ mod parser;
 /// The macro expands to a newtype struct around a `u8` to `u128`, depending on the total bit width
 /// of the definition, with automatically generated getters and setters for each field.
 ///
+/// ### API
+/// #### Usage Example
+/// ```
+/// use macros::bitmap;
+///
+/// bitmap!(
+///     struct Player {
+///         imposter: u1,
+///         finished_tasks: u3,
+///         kills: u3,
+///     }
+/// );
+///
+/// let mut player = Player(0);
+/// assert_eq!(std::mem::size_of::<Player>(), 1);
+///
+/// player.set_imposter(1);
+/// player.set_finished_tasks(5);
+/// player.set_kills(3);
+///
+/// assert_eq!(player.imposter(), 1);
+/// assert_eq!(player.finished_tasks(), 5);
+/// assert_eq!(player.kills(), 3);
+/// assert_eq!(*player, 0b01101011);
+/// ```
+/// #### Accessing fields
+/// For each field `name: T`, where `T` is the smallest possible integer such that
+/// `field_size <= integer.size`, `bitmap!` generates:
+///
+/// - `fn name(&self) -> T` — returns the value for `name`
+/// - `fn set_name(&mut self, val: T)` — sets the value for `name`
+///
+/// #### Accessing the raw value
+/// For the struct `Bits(T)`, where `T` is the unsigned integer type used for storage,
+/// the following traits are implemented:
+/// - `From<Bits> for T`
+/// - `Deref for Bits`, with `fn deref(&self) -> T`
+///
+/// ```
+/// use macros::bitmap;
+///
+/// bitmap!(
+///     struct Bits {
+///         a: u32,
+///         b: u16,
+///         c: u16,
+///     }
+/// );
+///
+/// let bits = Bits(0);
+/// let underlying_u64: u64 = bits.into();
+/// let underlying_u64 = *bits;
+/// ```
 /// ### Supported field types:
 /// ```
 /// use macros::bitmap;
@@ -63,60 +116,6 @@ mod parser;
 /// assert_eq!(core::mem::size_of::<Bits>(), 8);
 /// ```
 ///
-/// ### API
-/// #### Accessing fields
-/// For each field `name: T`, where `T` is the smallest possible integer such that
-/// `field_size <= integer.size`, `bitmap!` generates:
-///
-/// - `fn name(&self) -> T` — returns the value for `name`
-/// - `fn set_name(&mut self, val: T)` — sets the value for `name`
-///
-/// #### Accessing the raw value
-/// For the struct `Bits(T)`, where `T` is the unsigned integer type used for storage,
-/// the following traits are implemented:
-/// - `From<Bits> for T`
-/// - `Deref for Bits`, with `fn deref(&self) -> T`
-///
-/// ```
-/// use macros::bitmap;
-///
-/// bitmap!(
-///     struct Bits {
-///         a: u32,
-///         b: u16,
-///         c: u16,
-///     }
-/// );
-///
-/// let bits = Bits(0);
-/// let underlying_u64: u64 = bits.into();
-/// let underlying_u64 = *bits;
-/// ```
-///
-/// ### Usage Example
-/// ```
-/// use macros::bitmap;
-///
-/// bitmap!(
-///     struct Player {
-///         imposter: u1,
-///         finished_tasks: u3,
-///         kills: u3,
-///     }
-/// );
-///
-/// let mut player = Player(0);
-/// assert_eq!(std::mem::size_of::<Player>(), 1);
-///
-/// player.set_imposter(1);
-/// player.set_finished_tasks(5);
-/// player.set_kills(3);
-///
-/// assert_eq!(player.imposter(), 1);
-/// assert_eq!(player.finished_tasks(), 5);
-/// assert_eq!(player.kills(), 3);
-/// assert_eq!(*player, 0b01101011);
-/// ```
 #[proc_macro]
 pub fn bitmap(input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as parser::BitmapInput);

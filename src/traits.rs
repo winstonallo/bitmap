@@ -1,14 +1,12 @@
-use std::ops::Range;
-
 pub trait BitMap<T> {
     /// Gets the bit at position `index` from `&self`.
     fn get_bit(&self, index: u8) -> T;
     /// Sets the bit at position `index` in `&self`.
     fn set_bit(&mut self, index: u8, value: T);
     /// Gets the bits at positions `indices.start..indices.end` from `&self`.
-    fn get_bits(&self, indices: Range<u8>) -> T;
+    fn get_bits(&self, indices: ::core::ops::Range<u8>) -> T;
     /// Sets the bits at positions `indices.start..indices.end` in `&self`.
-    fn set_bits(&mut self, indices: Range<u8>, value: T);
+    fn set_bits(&mut self, indices: ::core::ops::Range<u8>, value: T);
 }
 
 macro_rules! impl_bitmap {
@@ -22,7 +20,7 @@ macro_rules! impl_bitmap {
                 *self = (*self & !(1 << index)) | ((value & 1) << index);
             }
 
-            fn set_bits(&mut self, indices: Range<u8>, value: $ty) {
+            fn set_bits(&mut self, indices: ::core::ops::Range<u8>, value: $ty) {
                 let width = indices.end - indices.start;
                 let bit_count = ::core::mem::size_of::<$ty>() * 8;
 
@@ -31,7 +29,7 @@ macro_rules! impl_bitmap {
                 *self = (*self & !(mask << indices.start)) | ((value & mask) << indices.start);
             }
 
-            fn get_bits(&self, indices: Range<u8>) -> $ty {
+            fn get_bits(&self, indices: ::core::ops::Range<u8>) -> $ty {
                 let width = indices.end - indices.start;
                 let bit_count = ::core::mem::size_of::<$ty>() * 8;
 

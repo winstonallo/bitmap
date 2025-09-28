@@ -45,15 +45,10 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
 
     let storage_ty = get_storage_ty(size as u8);
 
-    let mut bit_index = 0;
-    let mut storage_index = 0;
-    let mut current_storage_ty_index = 0;
+    let mut bit_index = size;
     let accessors = fields.iter().map(|ident| {
-        if ident.size + current_storage_ty_index >= _packed_layout[storage_index] {
-            // handle field spanning multiple storage units
-        }
-        let index: u8 = bit_index;
-        bit_index += ident.size;
+        bit_index -= ident.size as usize;
+        let index: usize = bit_index;
         let setter_name = Ident::new(&format!("set_{}", ident.name), ident.name.span());
         let name = ident.name.to_owned();
         let size = ident.size;

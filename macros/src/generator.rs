@@ -82,13 +82,13 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
              #(#accessors)*
          }
 
-         impl From<#name> for #storage_ty {
+         impl ::core::convert::From<#name> for #storage_ty {
              fn from(value: #name) -> Self {
                  value.0
              }
          }
 
-         impl core::ops::Deref for #name {
+         impl ::core::ops::Deref for #name {
              type Target = #storage_ty;
              fn deref(&self) -> &Self::Target {
                  &self.0

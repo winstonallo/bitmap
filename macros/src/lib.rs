@@ -4,24 +4,96 @@ use syn::parse_macro_input;
 mod generator;
 mod parser;
 
-/// Generates a bitmap struct from the given definition.
+/// Generates a packed bitmap newtype struct with field-level bit access.
 ///
-/// The macro expands to a newtype struct around a `u8` to `u64` (depending on the total size
-/// of the definition), with automatically generated getters and setters for each field.
+/// The macro expands to a newtype struct around a `u8` to `u128`, depending on the total bit width
+/// of the definition, with automatically generated getters and setters for each field.
 ///
-/// ### Supported field types
-/// - `u1` through `u7`
+/// ### Supported field types:
+/// ```
+/// use macros::bitmap;
 ///
-/// ### Current Limitations
-/// - Total bit size must be ≤ 64 bits.
-/// - No values larger than `u7` currently supported
+/// bitmap!(
+///     struct Bits {
+///         flag: u1,
+///         counter: u7,
+///     }
+/// );
+/// ```
+/// Each field must be in the form `uN`, where `1 <= N <= 128`.
+/// ### Maximum total size
+/// `bitmap!` uses the smallest possible integer type such that `total_bit_width <= integer.bit_width`.
+/// The total bit width must fit into a `u128`. If you need more than that, consider using a `Vec`
+/// of `bitmap`s.
+/// ### Storage order
+/// Fields are packed from **most significant bit (MSB)** to **least significant bit (LSB)**, matching
+/// big-endian order.
 ///
-/// ### Generated API
-/// For each field `name: T`, the macro generates:
-/// - `fn name(&self) -> T` — returns the field value.
-/// - `fn set_name(&mut self, val: T)` — sets the field value.
+/// This means the first declared field is stored in the highest bits of the underlying storage integer.
+/// ```
+/// use macros::bitmap;
 ///
-/// ### Example
+/// bitmap!(
+///     struct Bits {
+///         a: u8,
+///         b: u8,
+///     }
+/// );
+///
+/// let mut bits = Bits(0);
+/// bits.set_a(0xaa)
+///     .set_b(0xbb);
+///
+/// assert_eq!(*bits, 0xaabb);
+/// ```
+///
+/// ### Note
+/// `bitmap!` is built with hardware configuration in mind, where most packed bitmaps have a size
+/// aligned to integer sizes. It does not use the _smallest possible size_: a bitmap with only one `u33`
+/// field will take up 64 bits of space.
+/// ```
+/// use macros::bitmap;
+///
+/// bitmap!(
+///     struct Bits {
+///         field: u33,
+///     }
+/// );
+///
+/// assert_eq!(core::mem::size_of::<Bits>(), 8);
+/// ```
+///
+/// ### API
+/// #### Accessing fields
+/// For each field `name: T`, where `T` is the smallest possible integer such that
+/// `field_size <= integer.size`, `bitmap!` generates:
+///
+/// - `fn name(&self) -> T` — returns the value for `name`
+/// - `fn set_name(&mut self, val: T)` — sets the value for `name`
+///
+/// #### Accessing the raw value
+/// For the struct `Bits(T)`, where `T` is the unsigned integer type used for storage,
+/// the following traits are implemented:
+/// - `From<Bits> for T`
+/// - `Deref for Bits`, with `fn deref(&self) -> T`
+///
+/// ```
+/// use macros::bitmap;
+///
+/// bitmap!(
+///     struct Bits {
+///         a: u32,
+///         b: u16,
+///         c: u16,
+///     }
+/// );
+///
+/// let bits = Bits(0);
+/// let underlying_u64: u64 = bits.into();
+/// let underlying_u64 = *bits;
+/// ```
+///
+/// ### Usage Example
 /// ```
 /// use macros::bitmap;
 ///
@@ -43,6 +115,7 @@ mod parser;
 /// assert_eq!(player.imposter(), 1);
 /// assert_eq!(player.finished_tasks(), 5);
 /// assert_eq!(player.kills(), 3);
+/// assert_eq!(*player, 0b01101011);
 /// ```
 #[proc_macro]
 pub fn bitmap(input: TokenStream) -> TokenStream {

@@ -76,7 +76,7 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
     Ok(quote! {
         #[derive(Debug, Clone, Copy)]
         #[repr(transparent)]
-         pub struct #name(pub #storage_ty);
+         pub struct #name(#storage_ty);
 
          impl #name {
              #(#accessors)*

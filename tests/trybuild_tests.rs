@@ -15,3 +15,9 @@ fn invalid_type_zero() {
     let t = trybuild::TestCases::new();
     t.compile_fail("tests/ui/invalid_type_zero.rs");
 }
+
+#[test]
+fn traits() {
+    let t = trybuild::TestCases::new();
+    t.pass("tests/ui/traits.rs");
+}

@@ -1,11 +1,13 @@
-# `bitmap!`
+# bitmap
+
+## `BitMap` trait
+
+## `bitmap!` API
 
 Generates a packed bitmap newtype struct with field-level bit access.
 
 The macro expands to a newtype struct around a `u8` to `u128`, depending on the total bit width
 of the definition, with automatically generated getters and setters for each field.
-
-## API
 
 ### Usage Example
 

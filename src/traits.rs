@@ -1,9 +1,13 @@
 use std::ops::Range;
 
 pub trait BitMap<T> {
+    /// Gets the bit at position `index` from `&self`.
     fn get_bit(&self, index: u8) -> T;
+    /// Sets the bit at position `index` in `&self`.
     fn set_bit(&mut self, index: u8, value: T);
+    /// Gets the bits at positions `indices.start..indices.end` from `&self`.
     fn get_bits(&self, indices: Range<u8>) -> T;
+    /// Sets the bits at positions `indices.start..indices.end` in `&self`.
     fn set_bits(&mut self, indices: Range<u8>, value: T);
 }
 

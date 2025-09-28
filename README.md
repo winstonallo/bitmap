@@ -2,7 +2,38 @@
 
 ## `BitMap` trait
 
-## `bitmap!` API
+This trait defines the following API:
+
+```
+
+pub trait BitMap<T> {
+    /// Gets the bit at position `index` from `&self`.
+    fn get_bit(&self, index: u8) -> T;
+    /// Sets the bit at position `index` in `&self`.
+    fn set_bit(&mut self, index: u8, value: T);
+    /// Gets the bits at positions `indices.start..indices.end` from `&self`.
+    fn get_bits(&self, indices: Range<u8>) -> T;
+    /// Sets the bits at positions `indices.start..indices.end` in `&self`.
+    fn set_bits(&mut self, indices: Range<u8>, value: T);
+}
+```
+
+By using the crate's `traits` prelude, the `BitMap` trait is implemented for `u8`, `u16`, `u32`, `u64`, and `u128`.
+
+```rust
+use bitmap::traits::*;
+
+fn main() {
+    let mut x: u64 = 0;
+
+    x.set_bit(1, 1);
+    assert_eq!(x, 2);
+    x.set_bit(1, 0);
+    assert_eq!(x, 0);
+}
+```
+
+## `bitmap!` Procedural Macro
 
 Generates a packed bitmap newtype struct with field-level bit access.
 
@@ -25,9 +56,9 @@ bitmap!(
 let mut player = Player(0);
 assert_eq!(std::mem::size_of::<Player>(), 1);
 
-player.set_imposter(1);
-player.set_finished_tasks(5);
-player.set_kills(3);
+player.set_imposter(1)
+    .set_finished_tasks(5)
+    .set_kills(3);
 
 assert_eq!(player.imposter(), 1);
 assert_eq!(player.finished_tasks(), 5);

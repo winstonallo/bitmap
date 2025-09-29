@@ -29,6 +29,9 @@ fn main() {
     assert_eq!(x, 2);
     x.set_bit(1, 0);
     assert_eq!(x, 0);
+    x.set_bits(0..2, 0b11);
+    let y = x.get_bits(0..2);
+    assert_eq!(y, 3);
 }
 ```
 

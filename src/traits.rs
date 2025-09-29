@@ -12,14 +12,17 @@ pub trait BitMap<T> {
 macro_rules! impl_bitmap {
     ($ty:ident) => {
         impl BitMap<$ty> for $ty {
+            #[inline]
             fn get_bit(&self, index: u8) -> $ty {
                 *self >> index & 0b1
             }
 
+            #[inline]
             fn set_bit(&mut self, index: u8, value: $ty) {
                 *self = (*self & !(1 << index)) | ((value & 1) << index);
             }
 
+            #[inline]
             fn set_bits(&mut self, indices: ::core::ops::Range<u8>, value: $ty) {
                 let width = indices.end - indices.start;
                 let bit_count = ::core::mem::size_of::<$ty>() * 8;
@@ -29,6 +32,7 @@ macro_rules! impl_bitmap {
                 *self = (*self & !(mask << indices.start)) | ((value & mask) << indices.start);
             }
 
+            #[inline]
             fn get_bits(&self, indices: ::core::ops::Range<u8>) -> $ty {
                 let width = indices.end - indices.start;
                 let bit_count = ::core::mem::size_of::<$ty>() * 8;

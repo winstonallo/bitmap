@@ -28,7 +28,6 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
     let mut bit_index = size;
     let accessors = fields.iter().map(|ident| {
         bit_index -= ident.size as usize;
-        let index: usize = bit_index;
         let setter_name = Ident::new(&format!("set_{}", ident.name), ident.name.span());
         let name = ident.name.to_owned();
         let size = ident.size;
@@ -42,13 +41,13 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         quote! {
             #[inline]
             pub const fn #name(&self) -> #this_storage_ty {
-                ((self.0 >> #index) & #mask) as #this_storage_ty
+                ((self.0 >> #bit_index) & #mask) as #this_storage_ty
             }
 
             #[inline]
             pub fn #setter_name(&mut self, value: #this_storage_ty) -> &mut Self {
                 assert!(value <= #mask as #this_storage_ty);
-                self.0 = ((self.0 & !((#mask) << #index)) | (((value as #storage_ty) & #mask) << #index));
+                self.0 = ((self.0 & !((#mask) << #bit_index)) | (((value as #storage_ty) & #mask) << #bit_index));
                 self
             }
         }

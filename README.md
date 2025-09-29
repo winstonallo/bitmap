@@ -1,6 +1,6 @@
 # bitmap
 
-## `BitMap` trait
+## `BitMap` Trait
 
 This trait defines the following API:
 

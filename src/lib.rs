@@ -1,7 +1,9 @@
 #![no_std]
 
 pub use macros::bitmap;
+pub use macros::bitmap_attr;  
 pub use traits::*;
+
 
 pub mod traits;
 

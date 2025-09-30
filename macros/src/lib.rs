@@ -1,5 +1,8 @@
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
+use syn::DeriveInput;  
+use quote::quote;      
+use quote::ToTokens;  
 
 mod generator;
 mod parser;
@@ -116,11 +119,68 @@ mod parser;
 /// assert_eq!(core::mem::size_of::<Bits>(), 8);
 /// ```
 ///
+
 #[proc_macro]
 pub fn bitmap(input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as parser::BitmapInput);
     match generator::expand_bitmap(parsed) {
         Ok(tokens) => tokens.into(),
         Err(err) => err.to_compile_error().into(),
+    }
+}
+
+#[proc_macro_attribute]
+pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    
+    // Convert the attribute macro input to the existing BitmapInput format
+    let bitmap_input = convert_derive_to_bitmap_input(input);
+    
+    // Use the EXACT SAME expansion logic as the bitmap! macro
+    match generator::expand_bitmap(bitmap_input) {
+        Ok(tokens) => tokens.into(),
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
+    let name = input.ident;  // Use 'name' not 'struct_name'
+    
+    // Extract struct fields
+    let syn::Data::Struct(data_struct) = input.data else {
+        panic!("#[bitmap_attr] can only be used on structs");
+    };
+    
+    let syn::Fields::Named(fields_named) = data_struct.fields else {
+        panic!("#[bitmap_attr] struct must have named fields");
+    };
+    
+    // Convert each field to the format expected by the existing parser
+    let fields = fields_named.named.into_iter().map(|field| {
+        let field_name = field.ident.expect("Field must have a name");
+        let field_type = field.ty;
+        
+        // Extract the size from the type (e.g., u1 -> 1, u7 -> 7)
+        let type_str = field_type.to_token_stream().to_string();
+        
+        if !type_str.starts_with("u") {
+            panic!("Field type must be unsigned integer like u1, u2, etc.");
+        }
+        
+        let size: u8 = type_str[1..].parse().expect("Invalid bit width");
+        
+        if size == 0 || size > 128 {
+            panic!("Invalid size for {}, expected u{{1..128}}", type_str);
+        }
+        
+        parser::FieldDef {
+            name: field_name,
+            size,
+        }
+    }).collect();
+    
+    parser::BitmapInput {
+        name,  // Use 'name' not 'struct_name'
+        fields,
     }
 }

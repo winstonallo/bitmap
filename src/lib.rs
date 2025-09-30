@@ -1,6 +1,7 @@
 #![no_std]
 
 pub use macros::bitmap;
+pub use macros::bitmap_attr;
 pub use traits::*;
 
 pub mod traits;
@@ -118,6 +119,21 @@ macro_rules! test_width {
             assert_eq!(bits.field(), $val);
         }
     };
+}
+
+#[test]
+fn attribute_macro() {
+    #[bitmap_attr]
+    struct Bits {
+        a: u1,
+        b: u2,
+        c: u3,
+        d: u4,
+    }
+
+    let mut bits = Bits(0);
+    bits.set_a(0b1).set_b(0b00).set_c(0b111).set_d(0b0000);
+    assert_eq!(*bits, 0b1001110000);
 }
 
 include!(concat!(env!("OUT_DIR"), "/generated_tests.rs"));

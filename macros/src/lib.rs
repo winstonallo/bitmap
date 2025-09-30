@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use syn::parse_macro_input;
+use syn::{DeriveInput, parse_macro_input};
 
 mod generator;
 mod parser;
@@ -121,6 +121,18 @@ pub fn bitmap(input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as parser::BitmapInput);
     match generator::expand_bitmap(parsed) {
         Ok(tokens) => tokens.into(),
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+#[proc_macro_attribute]
+pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
+    let parsed = parse_macro_input!(input as DeriveInput);
+    match parser::BitmapInput::try_from(parsed) {
+        Ok(bitmap_input) => match generator::expand_bitmap(bitmap_input) {
+            Ok(tokens) => tokens.into(),
+            Err(err) => err.to_compile_error().into(),
+        },
         Err(err) => err.to_compile_error().into(),
     }
 }

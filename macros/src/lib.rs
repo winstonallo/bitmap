@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
 use syn::DeriveInput;  
-use quote::quote;      
+      
 use quote::ToTokens;  
 
 mod generator;
@@ -133,7 +133,7 @@ pub fn bitmap(input: TokenStream) -> TokenStream {
 pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     
-    // Convert the attribute macro input to the existing BitmapInput format
+    // Converting the attribute macro input to the existing BitmapInput format
     let bitmap_input = convert_derive_to_bitmap_input(input);
     
     // Use the EXACT SAME expansion logic as the bitmap! macro
@@ -144,9 +144,9 @@ pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
-    let name = input.ident;  // Use 'name' not 'struct_name'
+    let name = input.ident;  
     
-    // Extract struct fields
+    // Extracting struct fields
     let syn::Data::Struct(data_struct) = input.data else {
         panic!("#[bitmap_attr] can only be used on structs");
     };
@@ -155,12 +155,12 @@ fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
         panic!("#[bitmap_attr] struct must have named fields");
     };
     
-    // Convert each field to the format expected by the existing parser
+    // Converting each field to the format expected by the existing parser
     let fields = fields_named.named.into_iter().map(|field| {
         let field_name = field.ident.expect("Field must have a name");
         let field_type = field.ty;
         
-        // Extract the size from the type (e.g., u1 -> 1, u7 -> 7)
+        // Extracting the size from the type (e.g., u1 -> 1, u7 -> 7)
         let type_str = field_type.to_token_stream().to_string();
         
         if !type_str.starts_with("u") {
@@ -180,7 +180,7 @@ fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
     }).collect();
     
     parser::BitmapInput {
-        name,  // Use 'name' not 'struct_name'
+        name,  
         fields,
     }
 }

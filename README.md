@@ -64,6 +64,29 @@ assert_eq!(player.finished_tasks(), 5);
 assert_eq!(player.kills(), 3);
 assert_eq!(*player, 0b01101011);
 ```
+## `#[bitmap_attr]` Attribute Macro
+
+If you prefer attribute macro syntax, you can use `#[bitmap_attr]` instead of `bitmap!`. Both work exactly the same way.
+
+```rust
+use bitmap::bitmap_attr;
+
+#[bitmap_attr]
+struct Player {
+    imposter: u1,
+    finished_tasks: u3,
+    kills: u3,
+}
+
+let mut player = Player(0);
+player.set_imposter(1)
+    .set_finished_tasks(5)
+    .set_kills(3);
+
+assert_eq!(player.imposter(), 1);
+assert_eq!(player.finished_tasks(), 5);
+assert_eq!(player.kills(), 3);
+}
 
 ### Accessing fields
 

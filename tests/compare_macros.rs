@@ -1,4 +1,3 @@
-// tests/compare_macros.rs
 use bitmap::{bitmap, bitmap_attr};
 
 // Function-like macro (original)

@@ -1,4 +1,3 @@
-// tests/test_attr.rs
 use bitmap::bitmap_attr;
 
 #[bitmap_attr]
@@ -11,15 +10,15 @@ struct TestBits {
 fn test_attribute_macro_creates_correct_api() {
     let mut bits = TestBits(0);
     
-    // Test that the macro generated the correct methods
+    // Testing that the macro generated the correct methods
     bits.set_flag(1);
     bits.set_counter(42);
     
     assert_eq!(bits.flag(), 1);
     assert_eq!(bits.counter(), 42);
     
-    // Test the raw value
-    assert_eq!(*bits, 0b10101010); // flag=1 (MSB), counter=42
+    // Testing the raw value
+    assert_eq!(*bits, 0b10101010); 
     
     println!("Attribute macro creates correct bitmap API!");
 }

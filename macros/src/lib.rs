@@ -1,8 +1,6 @@
 use proc_macro::TokenStream;
 use syn::parse_macro_input;
-use syn::DeriveInput;  
-      
-use quote::ToTokens;  
+use syn::DeriveInput;
 
 mod generator;
 mod parser;
@@ -156,7 +154,6 @@ pub fn bitmap(input: TokenStream) -> TokenStream {
 /// assert_eq!(player.kills(), 3);
 /// assert_eq!(*player, 0b01101011);
 /// ```
-
 #[proc_macro_attribute]
 pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

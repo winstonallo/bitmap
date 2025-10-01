@@ -129,6 +129,34 @@ pub fn bitmap(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Generates a packed bitmap newtype struct with field-level bit access.
+///
+/// This attribute macro works exactly like the `bitmap!` macro but uses attribute syntax.
+///
+/// ### Usage Example
+/// ```
+/// use bitmap::bitmap_attr;
+///
+/// #[bitmap_attr]
+/// struct Player {
+///     imposter: u1,
+///     finished_tasks: u3,
+///     kills: u3,
+/// }
+///
+/// let mut player = Player(0);
+/// assert_eq!(std::mem::size_of::<Player>(), 1);
+///
+/// player.set_imposter(1);
+/// player.set_finished_tasks(5);
+/// player.set_kills(3);
+///
+/// assert_eq!(player.imposter(), 1);
+/// assert_eq!(player.finished_tasks(), 5);
+/// assert_eq!(player.kills(), 3);
+/// assert_eq!(*player, 0b01101011);
+/// ```
+
 #[proc_macro_attribute]
 pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
@@ -142,7 +170,7 @@ pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
-    let name = input.ident;  
+    let name = input.ident;
     
     let syn::Data::Struct(data_struct) = input.data else {
         panic!("#[bitmap_attr] can only be used on structs");
@@ -156,17 +184,12 @@ fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
         let field_name = field.ident.expect("Field must have a name");
         let field_type = field.ty;
         
-        let type_str = field_type.to_token_stream().to_string();
+        let syn::Type::Path(type_path) = field_type else {
+            panic!("Field type must be a path like u1, u7, etc.");
+        };
         
-        if !type_str.starts_with("u") {
-            panic!("Field type must be unsigned integer like u1, u2, etc.");
-        }
-        
-        let size: u8 = type_str[1..].parse().expect("Invalid bit width");
-        
-        if size == 0 || size > 128 {
-            panic!("Invalid size for {}, expected u{{1..128}}", type_str);
-        }
+        let segment = type_path.path.segments.last().expect("Type path must have a segment");
+        let size = parser::parse_bit_width(&segment.ident).expect("Invalid bit width");
         
         parser::FieldDef {
             name: field_name,
@@ -175,7 +198,7 @@ fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
     }).collect();
     
     parser::BitmapInput {
-        name,  
+        name,
         fields,
     }
 }

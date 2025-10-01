@@ -20,5 +20,5 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Run clippy
+            - name: Check formatting
               run: cargo fmt -- --check

@@ -33,18 +33,7 @@ impl Parse for FieldDef {
         let _: Token![:] = input.parse()?;
         let ty: Ident = input.parse()?;
 
-        let ty_str = ty.to_string();
-        let ty_str = ty_str.as_str();
-        if !ty_str.starts_with("u") {
-            return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty_str}, expected u{{1..128}}")));
-        }
-        let size = *match &ty_str[1..].parse::<u8>() {
-            Ok(val) => val,
-            Err(e) => return Err(syn::Error::new_spanned(ty, format!("Could not parse type size: {e}"))),
-        };
-        if size == 0 || size > 128 {
-            return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty_str}, expected u{{1..128}}")));
-        }
+        let size = parse_bit_width(&ty)?;
 
         Ok(FieldDef { name, size })
     }
@@ -55,7 +44,8 @@ pub fn parse_bit_width(ty: &syn::Ident) -> Result<u8> {
     if !ty_str.starts_with("u") {
         return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty_str}, expected u{{1..128}}")));
     }
-    let size = ty_str[1..].parse::<u8>()
+    let size = ty_str[1..]
+        .parse::<u8>()
         .map_err(|e| syn::Error::new_spanned(ty, format!("Could not parse type size: {e}")))?;
     if size == 0 || size > 128 {
         return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty_str}, expected u{{1..128}}")));

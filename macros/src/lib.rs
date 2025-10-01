@@ -133,10 +133,8 @@ pub fn bitmap(input: TokenStream) -> TokenStream {
 pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     
-    // Converting the attribute macro input to the existing BitmapInput format
     let bitmap_input = convert_derive_to_bitmap_input(input);
     
-    // Use the EXACT SAME expansion logic as the bitmap! macro
     match generator::expand_bitmap(bitmap_input) {
         Ok(tokens) => tokens.into(),
         Err(err) => err.to_compile_error().into(),
@@ -146,7 +144,6 @@ pub fn bitmap_attr(_args: TokenStream, input: TokenStream) -> TokenStream {
 fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
     let name = input.ident;  
     
-    // Extracting struct fields
     let syn::Data::Struct(data_struct) = input.data else {
         panic!("#[bitmap_attr] can only be used on structs");
     };
@@ -155,12 +152,10 @@ fn convert_derive_to_bitmap_input(input: DeriveInput) -> parser::BitmapInput {
         panic!("#[bitmap_attr] struct must have named fields");
     };
     
-    // Converting each field to the format expected by the existing parser
     let fields = fields_named.named.into_iter().map(|field| {
         let field_name = field.ident.expect("Field must have a name");
         let field_type = field.ty;
         
-        // Extracting the size from the type (e.g., u1 -> 1, u7 -> 7)
         let type_str = field_type.to_token_stream().to_string();
         
         if !type_str.starts_with("u") {

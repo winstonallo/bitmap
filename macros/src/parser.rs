@@ -48,31 +48,6 @@ impl TryFrom<DeriveInput> for BitmapInput {
     }
 }
 
-fn extract_size_from_type(ty: &Type) -> Result<u8> {
-    match ty {
-        Type::Path(TypePath { path, .. }) => {
-            let segment = path.segments.last().unwrap();
-            let ty_str = segment.ident.to_string();
-
-            if !ty_str.starts_with("u") {
-                return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty_str}, expected u{{1..128}}")));
-            }
-
-            let size = match ty_str[1..].parse::<u8>() {
-                Ok(val) => val,
-                Err(e) => return Err(syn::Error::new_spanned(ty, format!("Could not parse type size: {e}"))),
-            };
-
-            if size == 0 || size > 128 {
-                return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty_str}, expected u{{1..128}}")));
-            }
-
-            Ok(size)
-        }
-        _ => Err(syn::Error::new_spanned(ty, "Expected a simple type like u1, u8, etc.")),
-    }
-}
-
 pub struct FieldDef {
     pub name: Ident,
     pub size: u8,
@@ -83,20 +58,36 @@ impl Parse for FieldDef {
         let name: Ident = input.parse()?;
         let _: Token![:] = input.parse()?;
         let ty: Ident = input.parse()?;
-
-        let ty_str = ty.to_string();
-        let ty_str = ty_str.as_str();
-        if !ty_str.starts_with("u") {
-            return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty_str}, expected u{{1..128}}")));
-        }
-        let size = *match &ty_str[1..].parse::<u8>() {
-            Ok(val) => val,
-            Err(e) => return Err(syn::Error::new_spanned(ty, format!("Could not parse type size: {e}"))),
-        };
-        if size == 0 || size > 128 {
-            return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty_str}, expected u{{1..128}}")));
-        }
-
-        Ok(FieldDef { name, size })
+        Ok(FieldDef {
+            name,
+            size: parse_bit_width(&ty.to_string())?,
+        })
     }
+}
+
+fn extract_size_from_type(ty: &Type) -> Result<u8> {
+    match ty {
+        Type::Path(TypePath { path, .. }) => {
+            let segment = path.segments.last().unwrap();
+            parse_bit_width(&segment.ident.to_string())
+        }
+        _ => Err(syn::Error::new_spanned(ty, "Expected a simple type like u1, u8, etc.")),
+    }
+}
+
+fn parse_bit_width(ty: &str) -> Result<u8> {
+    if !ty.starts_with("u") {
+        return Err(syn::Error::new_spanned(ty, format!("Invalid type {ty}, expected u{{1..128}}")));
+    }
+
+    let size = match ty[1..].parse::<u8>() {
+        Ok(val) => val,
+        Err(e) => return Err(syn::Error::new_spanned(ty, format!("Could not parse type size: {e}"))),
+    };
+
+    if size == 0 || size > 128 {
+        return Err(syn::Error::new_spanned(ty, format!("Invalid size for {ty}, expected u{{1..128}}")));
+    }
+
+    Ok(size)
 }

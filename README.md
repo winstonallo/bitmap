@@ -47,13 +47,12 @@ of the definition, with automatically generated getters and setters for each fie
 ```rust
 use bitmap::bitmap;
 
-bitmap!(
-    struct Player {
-        imposter: u1,
-        finished_tasks: u3,
-        kills: u3,
-    }
-);
+#[bitmap]
+struct Player {
+    imposter: u1,
+    finished_tasks: u3,
+    kills: u3,
+}
 
 let mut player = Player(0);
 assert_eq!(std::mem::size_of::<Player>(), 1);
@@ -87,13 +86,12 @@ the following traits are implemented:
 ```rust
 use bitmap::bitmap;
 
-bitmap!(
-    struct Bits {
-        a: u32,
-        b: u16,
-        c: u16,
-    }
-);
+#[bitmap]
+struct Bits {
+    a: u32,
+    b: u16,
+    c: u16,
+}
 
 let bits = Bits(0);
 let underlying_u64: u64 = bits.into();
@@ -105,12 +103,11 @@ let underlying_u64 = *bits;
 ```rust
 use bitmap::bitmap;
 
-bitmap!(
-    struct Bits {
-        flag: u1,
-        counter: u7,
-    }
-);
+#[bitmap]
+struct Bits {
+    flag: u1,
+    counter: u7,
+}
 ```
 
 Each field must be in the form `uN`, where `1 <= N <= 128`.
@@ -131,12 +128,11 @@ This means the first declared field is stored in the highest bits of the underly
 ```rust
 use bitmap::bitmap;
 
-bitmap!(
-    struct Bits {
-        a: u8,
-        b: u8,
-    }
-);
+#[bitmap]
+struct Bits {
+    a: u8,
+    b: u8,
+}
 
 let mut bits = Bits(0);
 bits.set_a(0xaa)
@@ -154,11 +150,10 @@ field will take up 64 bits of space.
 ```rust
 use bitmap::bitmap;
 
-bitmap!(
-    struct Bits {
-        field: u33,
-    }
-);
+#[bitmap]
+struct Bits {
+    field: u33,
+}
 
 assert_eq!(core::mem::size_of::<Bits>(), 8);
 ```

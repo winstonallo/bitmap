@@ -1,5 +1,7 @@
 error: Invalid size for u0, expected u{1..128}
- --> tests/ui/invalid_type_zero.rs:6:21
+ --> tests/ui/invalid_type_zero.rs:4:5
   |
-6 |             field0: u0,
-  |                     ^^
+4 |     #[bitmap]
+  |     ^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `bitmap` (in Nightly builds, run with -Z macro-backtrace for more info)

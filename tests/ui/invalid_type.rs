@@ -1,9 +1,8 @@
 use macros::bitmap;
 
 fn main() {
-    bitmap!(
-        struct Bits {
-            field0: u129,
-        }
-    );
+    #[bitmap]
+    struct Bits {
+        field0: u129,
+    }
 }

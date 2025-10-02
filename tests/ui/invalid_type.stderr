@@ -1,5 +1,7 @@
 error: Invalid size for u129, expected u{1..128}
- --> tests/ui/invalid_type.rs:6:21
+ --> tests/ui/invalid_type.rs:4:5
   |
-6 |             field0: u129,
-  |                     ^^^^
+4 |     #[bitmap]
+  |     ^^^^^^^^^
+  |
+  = note: this error originates in the attribute macro `bitmap` (in Nightly builds, run with -Z macro-backtrace for more info)

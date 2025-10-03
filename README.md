@@ -143,7 +143,7 @@ assert_eq!(*bits, 0xaabb);
 
 ## Note
 
-`bitmap!` is built with hardware configuration in mind, where most packed bitmaps have a size
+`#[bitmap]` is built with hardware configuration in mind, where most packed bitmaps have a size
 aligned to integer sizes. It does not use the _smallest possible size_: a bitmap with only one `u33`
 field will take up 64 bits of space.
 

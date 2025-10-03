@@ -1,26 +1,12 @@
-use syn::punctuated::Punctuated;
-use syn::token::Struct;
 use syn::{Data, DataStruct, DeriveInput, Fields, Type, TypePath};
 use syn::{
-    Ident, Result, Token, braced,
+    Ident, Result, Token,
     parse::{Parse, ParseStream},
 };
 
 pub struct BitmapInput {
     pub name: Ident,
     pub fields: Vec<FieldDef>,
-}
-
-impl Parse for BitmapInput {
-    fn parse(input: ParseStream) -> Result<Self> {
-        input.parse::<Struct>()?;
-        let name: Ident = input.parse()?;
-        let content;
-        braced!(content in input);
-        let punctuation: Punctuated<FieldDef, Token![,]> = content.parse_terminated(FieldDef::parse, Token![,])?;
-        let fields = punctuation.into_iter().collect();
-        Ok(BitmapInput { name, fields })
-    }
 }
 
 impl TryFrom<DeriveInput> for BitmapInput {

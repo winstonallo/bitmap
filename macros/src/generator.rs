@@ -45,8 +45,8 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
             }
 
             #[inline]
-            pub fn #setter_name(&mut self, value: #storage_ty) -> &mut Self {
-                assert!(value <= #mask as #storage_ty);
+            pub fn #setter_name(&mut self, value: #this_storage_ty) -> &mut Self {
+                assert!(value <= #mask as #this_storage_ty);
                 self.0 = ((self.0 & !((#mask) << #bit_index)) | (((value as #storage_ty) & #mask) << #bit_index));
                 self
             }
@@ -69,7 +69,17 @@ pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
         pub struct #name(#storage_ty);
 
         impl #name {
+            fn new(value: #storage_ty) -> Self {
+                Self(value)
+            }
+
             #(#accessors)*
+        }
+
+        impl Default for #name {
+            fn default() -> Self {
+                Self(0)
+            }
         }
 
         impl ::core::convert::From<#name> for #storage_ty {

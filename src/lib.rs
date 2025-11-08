@@ -1,13 +1,13 @@
 #![no_std]
 
-pub use macros::bitmap;
+pub use macros::bitstruct;
 pub use traits::*;
 
 pub mod traits;
 
 #[test]
 fn one_bit() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u1,
     }
@@ -18,7 +18,7 @@ fn one_bit() {
 
 #[test]
 fn two_bits() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u1,
         b: u1,
@@ -31,7 +31,7 @@ fn two_bits() {
 
 #[test]
 fn sixty_four_bits_funky_layout() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u1,
         b: u7,
@@ -51,7 +51,7 @@ fn sixty_four_bits_funky_layout() {
 
 #[test]
 fn sixty_four_bits_aligned() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u32,
         b: u32,
@@ -63,7 +63,7 @@ fn sixty_four_bits_aligned() {
 
 #[test]
 fn hundred_and_twenty_eight_bits_funky_layout() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u40,
         b: u25,
@@ -86,7 +86,7 @@ fn hundred_and_twenty_eight_bits_funky_layout() {
 
 #[test]
 fn hundred_and_twenty_eight_bits_aligned() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u32,
         b: u32,
@@ -102,7 +102,7 @@ macro_rules! test_width {
     ($name:ident, $val:literal) => {
         #[test]
         fn $name() {
-            #[bitmap]
+            #[bitstruct]
             struct Bits {
                 field: $name,
             }
@@ -115,7 +115,7 @@ macro_rules! test_width {
 
 #[test]
 fn attribute_macro() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         a: u1,
         b: u2,

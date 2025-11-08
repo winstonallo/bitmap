@@ -1,5 +1,5 @@
 error: Too many fields: maximum supported size is 128 bits
- --> tests/ui/bitmap_too_large.rs:5:12
+ --> tests/ui/bitstruct_too_large.rs:5:12
   |
 5 |     struct Bits {
   |            ^^^^

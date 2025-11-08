@@ -1,7 +1,7 @@
-use macros::bitmap;
+use macros::bitstruct;
 
 fn main() {
-    #[bitmap]
+    #[bitstruct]
     struct Bits {
         field0: u128,
         field1: u1,

@@ -1,4 +1,4 @@
-use bitmap::traits::*;
+use bitstruct::traits::*;
 
 fn main() {
     let mut x: u128 = 0;

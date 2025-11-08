@@ -14,7 +14,7 @@ fn get_storage_ty(size: u8) -> TokenStream2 {
     }
 }
 
-pub fn expand_bitmap(input: BitmapInput) -> syn::Result<TokenStream2> {
+pub fn expand_bitstruct(input: BitmapInput) -> syn::Result<TokenStream2> {
     let name = &input.name;
     let fields = &input.fields;
     let size: usize = input.fields.iter().map(|f| f.size as usize).sum();

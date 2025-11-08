@@ -1,4 +1,4 @@
-pub trait BitMap<T> {
+pub trait Bits<T> {
     /// Gets the bit at position `index` from `&self`.
     fn get_bit(&self, index: u8) -> T;
     /// Sets the bit at position `index` in `&self`.
@@ -9,9 +9,9 @@ pub trait BitMap<T> {
     fn set_bits(&mut self, indices: ::core::ops::Range<u8>, value: T);
 }
 
-macro_rules! impl_bitmap {
+macro_rules! impl_bitstruct {
     ($ty:ident) => {
-        impl BitMap<$ty> for $ty {
+        impl Bits<$ty> for $ty {
             #[inline]
             fn get_bit(&self, index: u8) -> $ty {
                 *self >> index & 0b1
@@ -45,11 +45,11 @@ macro_rules! impl_bitmap {
     };
 }
 
-impl_bitmap!(u8);
-impl_bitmap!(u16);
-impl_bitmap!(u32);
-impl_bitmap!(u64);
-impl_bitmap!(u128);
+impl_bitstruct!(u8);
+impl_bitstruct!(u16);
+impl_bitstruct!(u32);
+impl_bitstruct!(u64);
+impl_bitstruct!(u128);
 
 #[cfg(test)]
 mod tests {

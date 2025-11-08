@@ -4,7 +4,7 @@ use syn::{DeriveInput, parse_macro_input};
 mod generator;
 mod parser;
 
-/// Generates a packed bitmap newtype struct with field-level bit access.
+/// Generates a packed bitstruct newtype struct with field-level bit access.
 ///
 /// The macro expands to a newtype struct around a `u8` to `u128`, depending on the total bit width
 /// of the definition, with automatically generated getters and setters for each field.
@@ -12,9 +12,9 @@ mod parser;
 /// ### API
 /// #### Usage Example
 /// ```
-/// use macros::bitmap;
+/// use macros::bitstruct;
 ///
-/// #[bitmap]
+/// #[bitstruct]
 /// struct Player {
 ///     imposter: u1,
 ///     finished_tasks: u3,
@@ -36,7 +36,7 @@ mod parser;
 /// ```
 /// #### Accessing fields
 /// For each field `name: T`, where `T` is the smallest possible integer such that
-/// `field_size <= integer.size`, `bitmap` generates:
+/// `field_size <= integer.size`, `bitstruct` generates:
 ///
 /// - `fn name(&self) -> T` — returns the value for `name`
 /// - `fn set_name(&mut self, val: T)` — sets the value for `name`
@@ -48,9 +48,9 @@ mod parser;
 /// - `Deref for Bits`, with `fn deref(&self) -> T`
 ///
 /// ```
-/// use macros::bitmap;
+/// use macros::bitstruct;
 ///
-/// #[bitmap]
+/// #[bitstruct]
 /// struct Bits {
 ///     a: u32,
 ///     b: u16,
@@ -63,9 +63,9 @@ mod parser;
 /// ```
 /// ### Supported field types:
 /// ```
-/// use macros::bitmap;
+/// use macros::bitstruct;
 ///
-/// #[bitmap]
+/// #[bitstruct]
 /// struct Bits {
 ///     flag: u1,
 ///     counter: u7,
@@ -73,18 +73,18 @@ mod parser;
 /// ```
 /// Each field must be in the form `uN`, where `1 <= N <= 128`.
 /// ### Maximum total size
-/// `bitmap` uses the smallest possible integer type such that `total_bit_width <= integer.bit_width`.
+/// `bitstruct` uses the smallest possible integer type such that `total_bit_width <= integer.bit_width`.
 /// The total bit width must fit into a `u128`. If you need more than that, consider using a `Vec`
-/// of `bitmap`s.
+/// of `bitstruct`s.
 /// ### Storage order
 /// Fields are packed from **most significant bit (MSB)** to **least significant bit (LSB)**, matching
 /// big-endian order.
 ///
 /// This means the first declared field is stored in the highest bits of the underlying storage integer.
 /// ```
-/// use macros::bitmap;
+/// use macros::bitstruct;
 ///
-/// #[bitmap]
+/// #[bitstruct]
 /// struct Bits {
 ///     a: u8,
 ///     b: u8,
@@ -98,13 +98,13 @@ mod parser;
 /// ```
 ///
 /// ### Note
-/// `bitmap` is built with hardware configuration in mind, where most packed bitmaps have a size
-/// aligned to integer sizes. It does not use the _smallest possible size_: a bitmap with only one `u33`
+/// `bitstruct` is built with hardware configuration in mind, where most packed bitstructs have a size
+/// aligned to integer sizes. It does not use the _smallest possible size_: a bitstruct with only one `u33`
 /// field will take up 64 bits of space.
 /// ```
-/// use macros::bitmap;
+/// use macros::bitstruct;
 ///
-/// #[bitmap]
+/// #[bitstruct]
 /// struct Bits {
 ///     field: u33,
 /// }
@@ -113,10 +113,10 @@ mod parser;
 /// ```
 ///
 #[proc_macro_attribute]
-pub fn bitmap(_args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn bitstruct(_args: TokenStream, input: TokenStream) -> TokenStream {
     let parsed = parse_macro_input!(input as DeriveInput);
     match parser::BitmapInput::try_from(parsed) {
-        Ok(bitmap_input) => match generator::expand_bitmap(bitmap_input) {
+        Ok(bitstruct_input) => match generator::expand_bitstruct(bitstruct_input) {
             Ok(tokens) => tokens.into(),
             Err(err) => err.to_compile_error().into(),
         },

@@ -27,7 +27,12 @@ impl TryFrom<DeriveInput> for BitmapInput {
                     Ok(FieldDef { name: field_name, size })
                 })
                 .collect::<Result<Vec<_>>>()?,
-            _ => return Err(syn::Error::new_spanned(name, "bitmap attribute can only be used on structs with named fields")),
+            _ => {
+                return Err(syn::Error::new_spanned(
+                    name,
+                    "bitstruct attribute can only be used on structs with named fields",
+                ));
+            }
         };
 
         Ok(BitmapInput { name, fields })

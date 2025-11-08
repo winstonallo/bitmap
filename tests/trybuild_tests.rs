@@ -1,7 +1,7 @@
 #[test]
-fn bitmap_too_large() {
+fn bitstruct_too_large() {
     let t = trybuild::TestCases::new();
-    t.compile_fail("tests/ui/bitmap_too_large.rs");
+    t.compile_fail("tests/ui/bitstruct_too_large.rs");
 }
 
 #[test]

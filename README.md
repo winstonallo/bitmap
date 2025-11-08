@@ -1,11 +1,11 @@
-# bitmap
+# bitstruct
 
-## `BitMap` Trait
+## `Bits` Trait
 
 This trait defines the following API:
 
 ```rust
-pub trait BitMap<T> {
+pub trait Bits<T> {
     /// Gets the bit at position `index` from `&self`.
     fn get_bit(&self, index: u8) -> T;
     /// Sets the bit at position `index` in `&self`.
@@ -17,10 +17,10 @@ pub trait BitMap<T> {
 }
 ```
 
-By using the crate's `traits` prelude, the `BitMap` trait is implemented for `u8`, `u16`, `u32`, `u64`, and `u128`.
+By using the crate's `traits` prelude, the `Bits` trait is implemented for `u8`, `u16`, `u32`, `u64`, and `u128`.
 
 ```rust
-use bitmap::traits::*;
+use bitstruct::traits::*;
 
 fn main() {
     let mut x: u64 = 0;
@@ -35,9 +35,9 @@ fn main() {
 }
 ```
 
-## `bitmap!` Procedural Macro
+## `bitstruct!` Procedural Macro
 
-Generates a packed bitmap newtype struct with field-level bit access.
+Generates a packed bitstruct newtype struct with field-level bit access.
 
 The macro expands to a newtype struct around a `u8` to `u128`, depending on the total bit width
 of the definition, with automatically generated getters and setters for each field.
@@ -45,9 +45,9 @@ of the definition, with automatically generated getters and setters for each fie
 ### Usage Example
 
 ```rust
-use bitmap::bitmap;
+use bitstruct::bitstruct;
 
-#[bitmap]
+#[bitstruct]
 struct Player {
     imposter: u1,
     finished_tasks: u3,
@@ -70,7 +70,7 @@ assert_eq!(*player, 0b01101011);
 ### Accessing fields
 
 For each field `name: T`, where `T` is the smallest possible integer such that
-`field_size <= integer.size`, `bitmap!` generates:
+`field_size <= integer.size`, `bitstruct!` generates:
 
 - `fn name(&self) -> T`: returns the value for `name`
 - `fn set_name(&mut self, val: T)`: sets the value for `name`
@@ -84,9 +84,9 @@ the following traits are implemented:
 - `Deref for Bits`, with `fn deref(&self) -> T`
 
 ```rust
-use bitmap::bitmap;
+use bitstruct::bitstruct;
 
-#[bitmap]
+#[bitstruct]
 struct Bits {
     a: u32,
     b: u16,
@@ -101,9 +101,9 @@ let underlying_u64 = *bits;
 ### Supported field types:
 
 ```rust
-use bitmap::bitmap;
+use bitstruct::bitstruct;
 
-#[bitmap]
+#[bitstruct]
 struct Bits {
     flag: u1,
     counter: u7,
@@ -114,9 +114,9 @@ Each field must be in the form `uN`, where `1 <= N <= 128`.
 
 ### Maximum total size
 
-`bitmap!` uses the smallest possible integer type such that `total_bit_width <= integer.bit_width`.
+`bitstruct!` uses the smallest possible integer type such that `total_bit_width <= integer.bit_width`.
 The total bit width must fit into a `u128`. If you need more than that, consider using a `Vec`
-of `bitmap`s.
+of `bitstruct`s.
 
 ### Storage order
 
@@ -126,9 +126,9 @@ big-endian order.
 This means the first declared field is stored in the highest bits of the underlying storage integer.
 
 ```rust
-use bitmap::bitmap;
+use bitstruct::bitstruct;
 
-#[bitmap]
+#[bitstruct]
 struct Bits {
     a: u8,
     b: u8,
@@ -143,14 +143,14 @@ assert_eq!(*bits, 0xaabb);
 
 ## Note
 
-`#[bitmap]` is built with hardware configuration in mind, where most packed bitmaps have a size
-aligned to integer sizes. It does not use the _smallest possible size_: a bitmap with only one `u33`
+`#[bitstruct]` is built with hardware configuration in mind, where most packed bitstructs have a size
+aligned to integer sizes. It does not use the _smallest possible size_: a bitstruct with only one `u33`
 field will take up 64 bits of space.
 
 ```rust
-use bitmap::bitmap;
+use bitstruct::bitstruct;
 
-#[bitmap]
+#[bitstruct]
 struct Bits {
     field: u33,
 }

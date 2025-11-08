@@ -1,7 +1,7 @@
 error: Invalid size for u0, expected u{1..128}
  --> tests/ui/invalid_type_zero.rs:4:5
   |
-4 |     #[bitmap]
-  |     ^^^^^^^^^
+4 |     #[bitstruct]
+  |     ^^^^^^^^^^^^
   |
-  = note: this error originates in the attribute macro `bitmap` (in Nightly builds, run with -Z macro-backtrace for more info)
+  = note: this error originates in the attribute macro `bitstruct` (in Nightly builds, run with -Z macro-backtrace for more info)

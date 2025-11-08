@@ -35,7 +35,7 @@ fn main() {
 }
 ```
 
-## `bitstruct!` Procedural Macro
+## `bitstruct` Proc-Macro
 
 Generates a packed bitstruct newtype struct with field-level bit access.
 
